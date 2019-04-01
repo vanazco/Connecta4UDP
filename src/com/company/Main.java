@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 public class Main {
 
-    private final static String ColorPlayer1 = "\\u001B31;1m";
+    private static boolean turno = false;
 
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -39,8 +39,6 @@ public class Main {
             }
         }
 
-        System.out.println("");
-
         System.out.println(" 1  2  3  4  5  6  7");
         System.out.print("Escoge una columna: ");
         int leerPosicion = Integer.parseInt(br.readLine());
@@ -52,8 +50,15 @@ public class Main {
 
         for (int i = 6; i >= 0; i--) {
             if (tablero[i][leerPosicion].matches(" - ")) {
-                tablero[i][leerPosicion] = "\033[31m X \033[0m";
-                break;
+                if (turno) {
+                    tablero[i][leerPosicion] = "\033[31m X \033[0m";
+                    turno = false;
+                    break;
+                } else {
+                    tablero[i][leerPosicion] = "\033[33m O \033[0m";
+                    turno = true;
+                    break;
+                }
             }
         }
     }
