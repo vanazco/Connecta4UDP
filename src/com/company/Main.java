@@ -6,11 +6,22 @@ import java.io.InputStreamReader;
 
 public class Main {
 
+
+
+
     private final static String ColorPlayer1 = "\\u001B31;1m";
 
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
+
+        //INICIAR EL SERVER
+//        DatagramSocketServer server = new DatagramSocketServer();
+//
+//        server.init();
+//        server.runServer();
+
+
         String[][] tablero = new String[7][7];
 
         rellenarTablero(tablero);

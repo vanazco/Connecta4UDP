@@ -1,6 +1,6 @@
 package com.company;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,24 +9,22 @@ import java.nio.ByteBuffer;
 
 public class DatagramSocketServer {
     DatagramSocket socket;
-    int random = (int)(Math.random() * ((50 - 1) + 1)) + 1;
-    int code;
-    int report;
+
 
     public void init() throws SocketException {
         socket = new DatagramSocket(42069);
     }
 
     public void runServer() throws IOException {
-        byte [] receivingData = new byte[4];
+        byte [] receivingData = new byte[1024];
         byte [] sendingData;
         InetAddress clientIP;
         int clientPort;
 
 
-        while(random!= report){
+        while(true){
 
-            DatagramPacket packet = new DatagramPacket(receivingData, 4);
+            DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
 
             socket.receive(packet);
 
@@ -40,22 +38,37 @@ public class DatagramSocketServer {
                     clientIP, clientPort);
 
             socket.send(packet);
+
         }
+
     }
     private byte[] processData(byte[] data, int length) {
-        report = ByteBuffer.wrap(data).getInt();
-        if(random > report){
-            code = -1;
-            byte[] codeb = ByteBuffer.allocate(4).putInt(code).array();
-            return codeb;
-        }else if (random < report){
-            code = 1;
-            byte[] codeb = ByteBuffer.allocate(4).putInt(code).array();
-            return codeb;
-        }else{
-            code = 0;
-            byte[] codeb = ByteBuffer.allocate(4).putInt(code).array();
-            return codeb;
+        //OBJECTO Tablero
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        try{
+            ObjectInputStream ois = new ObjectInputStream(in);
+            // t = (Tablero) ois.readOnject();
+            //System.out.println("Tirada:" + t.jugador +"" + t.posicion);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }//catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        //Comprobar tirada.
+
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ObjectOutputStream oos = null;
+        try{
+            oos = new ObjectOutputStream(os);
+            //oos.writeObject(Tablero);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        byte[] respuesta = os.toByteArray();
+        return respuesta;
+
     }
+
 }
