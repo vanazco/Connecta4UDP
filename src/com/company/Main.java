@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 
 public class Main {
 
+    private final static String ColorPlayer1 = "\\u001B31;1m";
+
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
@@ -50,7 +52,7 @@ public class Main {
 
         for (int i = 6; i >= 0; i--) {
             if (tablero[i][leerPosicion].matches(" - ")) {
-                tablero[i][leerPosicion] = " X ";
+                tablero[i][leerPosicion] = "\033[31m X \033[0m";
                 break;
             }
         }
