@@ -34,9 +34,25 @@ class Tablero implements Serializable {
     }
 
     boolean jugar() throws IOException {
+        pintarTurno();
         pintarTablero();
         tirar();
         return !guanyador.isEmpty();
+    }
+
+    private static void preguntarDeNuevo() throws IOException {
+        pintarTurno();
+        pintarTablero();
+        tirar();
+    }
+
+    private static void pintarTurno() {
+        System.out.print("Turno de -> ");
+        if (turno) {
+            System.out.println("\033[31m X \033[0m");
+        } else {
+            System.out.println("\033[33m O \033[0m");
+        }
     }
 
     private static void rellenarTablero() {
@@ -58,28 +74,26 @@ class Tablero implements Serializable {
         }
     }
 
-    public static void tirar() throws IOException {
+    private static void tirar() throws IOException {
         System.out.println(" 1  2  3  4  5  6  7");
         System.out.print("Escoge una columna: ");
         String leer = br.readLine();
 
         if (leer.isEmpty()) {
             System.out.println("No se ha escrito nada.");
-            pintarTablero();
-            tirar();
+            preguntarDeNuevo();
             return;
         }
 
-        int leerPosicion = Integer.parseInt(leer);
+        int posicion = Integer.parseInt(leer);
 
-        if (leerPosicion >= 8 || leerPosicion < 1) {
+        if (posicion >= 8 || posicion < 1) {
             System.out.println("Input invalido.");
-            pintarTablero();
-            tirar();
+            preguntarDeNuevo();
             return;
         }
         
-        comprovarPosicion(leerPosicion, tablero);
+        comprovarPosicion(posicion, tablero);
     }
 
     private static void comprovarPosicion(int leerPosicion, String[][] tablero) {
