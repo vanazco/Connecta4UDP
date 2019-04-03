@@ -1,8 +1,6 @@
 package com.company;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 
@@ -11,64 +9,60 @@ class DatagramSocketClient {
     private InetAddress serverIP;
     private int serverPort;
     private DatagramSocket socket;
-    private int intentos = 3;
-    private boolean finalitzar = false;
+    private Tablero tablero;
 
-    void init(String host, int port) throws SocketException,
+
+    void init(String host) throws SocketException,
             UnknownHostException {
         serverIP = InetAddress.getByName(host);
-        serverPort = port;
+        serverPort = 42069;
         socket = new DatagramSocket();
     }
 
     void runClient() throws IOException {
-        byte [] receivedData = new byte[4];
-        int intentos = 3;
-
-        System.out.println("MÁXIM INTENTS -> 3");
+        byte [] receivedData = new byte[1024];
         //el servidor atén el port indefinidament
-        while(!finalitzar){
-            System.out.print("Escriu el numero (intents " + intentos + "): ");
-            int numero = Integer.parseInt(br.readLine());
+        while(tablero.code == 1){
+            tablero.tirar();
 
-            byte[] numeroBytes =  ByteBuffer.allocate(4).putInt(numero).array();
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            oos.writeObject(tablero);
+            byte[] missatge = os.toByteArray();
 
-            DatagramPacket packet = new DatagramPacket(numeroBytes,
-                    numeroBytes.length,
+            DatagramPacket packet = new DatagramPacket(missatge,
+                    missatge.length,
                     serverIP,
                     serverPort);
             //enviament de la resposta
             socket.send(packet);
 
             //creació del paquet per rebre les dades
-            packet = new DatagramPacket(receivedData, 4);
+            packet = new DatagramPacket(receivedData, 1024);
+            socket.setSoTimeout(5000);
             //espera de les dades
-            socket.receive(packet);
-            //processament de les dades rebudes i obtenció de la resposta
-            numeroBytes = packet.getData();
 
-            int numServer = ByteBuffer.wrap(numeroBytes).getInt();
-
-            if (numServer == 1) {
-                System.out.println("El numero es més petit.");
-                reducirIntento();
-            } else if (numServer == -1) {
-                System.out.println("El numero es més gran.");
-                reducirIntento();
-            } else {
-                System.out.println("Has guanyat!");
-                finalitzar = true;
+            try {
+                socket.receive(packet);
+                //processament de les dades rebudes i obtenció de la resposta
+                tablero.code = getDataToRequest(packet.getData(), packet.getLength());
+            }catch(SocketTimeoutException e) {
+                System.out.println("El servidor no respòn: " + e.getMessage());
+                tablero.code=0;
             }
         }
     }
 
-    private void reducirIntento() {
-        intentos--;
-        if (intentos <= 0) {
-            System.out.println("Has perdut...");
-            finalitzar = true;
-        } else {
-            System.out.println("Numero d'intents restants: " + intentos);
+    private int getDataToRequest(byte[] data, int length) {
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        try {
+            ObjectInputStream ois = new ObjectInputStream(in);
+            tablero = (Tablero) ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+        return tablero.code;
     }
 }

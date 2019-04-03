@@ -8,13 +8,15 @@ import java.io.Serializable;
 class Tablero implements Serializable {
     private static String[][] tablero = new String[7][7];
 
-    public static boolean isTurno() {
-        return turno;
-    }
-
     private static boolean turno = false;
     private static String guanyador;
     public int code;
+    public static boolean isTurno() {
+        return turno;
+    }
+    public static void setTurno(boolean turno) {
+        Tablero.turno = turno;
+    }
 
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -56,7 +58,7 @@ class Tablero implements Serializable {
         }
     }
 
-    private static void tirar() throws IOException {
+    public static void tirar() throws IOException {
         System.out.println(" 1  2  3  4  5  6  7");
         System.out.print("Escoge una columna: ");
         String leer = br.readLine();
@@ -65,6 +67,7 @@ class Tablero implements Serializable {
             System.out.println("No se ha escrito nada.");
             pintarTablero();
             tirar();
+            return;
         }
 
         int leerPosicion = Integer.parseInt(leer);
@@ -73,6 +76,7 @@ class Tablero implements Serializable {
             System.out.println("Input invalido.");
             pintarTablero();
             tirar();
+            return;
         }
         
         comprovarPosicion(leerPosicion, tablero);

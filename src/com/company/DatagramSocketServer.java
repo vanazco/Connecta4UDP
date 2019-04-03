@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 public class DatagramSocketServer {
     DatagramSocket socket;
     Tablero tablero;
+    boolean checkWinner = false;
 
 
     public void init() throws SocketException {
@@ -21,10 +22,10 @@ public class DatagramSocketServer {
         byte [] sendingData;
         InetAddress clientIP;
         int clientPort;
+        tablero = new Tablero();
 
-
-        while(true){
-
+        while(!checkWinner){
+            checkWinner = tablero.jugar();
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
 
             socket.receive(packet);
@@ -52,8 +53,11 @@ public class DatagramSocketServer {
             System.out.println(tablero.isTurno());
             if(tablero.isTurno()){
                 tablero.code = 1;
+                tablero.pintarTablero();
             }else{
                 tablero.code = -1;
+                tablero.pintarTablero();
+                tablero.getGuanyador();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,7 +76,6 @@ public class DatagramSocketServer {
         }
         byte[] respuesta = os.toByteArray();
         return respuesta;
-
     }
 
 }

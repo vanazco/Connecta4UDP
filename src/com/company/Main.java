@@ -1,21 +1,29 @@
 package com.company;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.Scanner;
 
 public class Main {
-    private static boolean checkWinner = false;
 
     public static void main(String[] args) throws IOException {
-        Tablero tablero = new Tablero();
+        DatagramSocketServer server = new DatagramSocketServer();
+        DatagramSocketClient socketClient = new DatagramSocketClient();
+        server.init();
+        server.runServer();
+
+        String ipsrv;
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Ip del servidor?");
+        ipsrv = sc.next();
+
+        socketClient.init(ipsrv);
+        socketClient.runClient();
 
 
-        while (!checkWinner) {
-            checkWinner = tablero.jugar();
-        }
 
-        Tablero.pintarTablero();
 
-        System.out.println("Guanyador: " + Tablero.getGuanyador());
     }
 
 }
