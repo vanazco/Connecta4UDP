@@ -40,7 +40,7 @@ class Tablero implements Serializable {
         }
     }
 
-    private static void pintarTablero() {
+    public static void pintarTablero() {
         for (String[] strings : tablero) {
             for (int j = 0; j < tablero.length; j++) {
                 System.out.print(strings[j]);
