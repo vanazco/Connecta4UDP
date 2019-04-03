@@ -8,8 +8,13 @@ import java.io.Serializable;
 class Tablero implements Serializable {
     private static String[][] tablero = new String[7][7];
 
+    public static boolean isTurno() {
+        return turno;
+    }
+
     private static boolean turno = false;
     private static String guanyador;
+    public int code;
 
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
