@@ -45,7 +45,7 @@ class Tablero implements Serializable {
         }
     }
 
-    private static void pintarTablero() {
+    static void pintarTablero() {
         for (String[] strings : tablero) {
             for (int j = 0; j < tablero.length; j++) {
                 System.out.print(strings[j]);
@@ -59,7 +59,22 @@ class Tablero implements Serializable {
     private static void tirar() throws IOException {
         System.out.println(" 1  2  3  4  5  6  7");
         System.out.print("Escoge una columna: ");
-        int leerPosicion = Integer.parseInt(br.readLine());
+        String leer = br.readLine();
+
+        if (leer.isEmpty()) {
+            System.out.println("No se ha escrito nada.");
+            pintarTablero();
+            tirar();
+        }
+
+        int leerPosicion = Integer.parseInt(leer);
+
+        if (leerPosicion >= 8 || leerPosicion < 1) {
+            System.out.println("Input invalido.");
+            pintarTablero();
+            tirar();
+        }
+        
         comprovarPosicion(leerPosicion, tablero);
     }
 

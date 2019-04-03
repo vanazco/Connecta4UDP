@@ -13,6 +13,8 @@ public class Main {
             checkWinner = tablero.jugar();
         }
 
+        Tablero.pintarTablero();
+
         System.out.println("Guanyador: " + Tablero.getGuanyador());
     }
 
