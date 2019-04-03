@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Tablero tablero = new Tablero();
 
+
         while (!checkWinner) {
             checkWinner = tablero.jugar();
         }

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 
 public class DatagramSocketServer {
     DatagramSocket socket;
+    Tablero tablero;
 
 
     public void init() throws SocketException {
@@ -43,26 +44,29 @@ public class DatagramSocketServer {
 
     }
     private byte[] processData(byte[] data, int length) {
-        //OBJECTO Tablero
+        tablero = null;
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         try{
             ObjectInputStream ois = new ObjectInputStream(in);
-            // t = (Tablero) ois.readOnject();
-            //System.out.println("Tirada:" + t.jugador +"" + t.posicion);
-
+             tablero = (Tablero) ois.readObject();
+            System.out.println(tablero.isTurno());
+            if(tablero.isTurno()){
+                tablero.code = 1;
+            }else{
+                tablero.code = -1;
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }//catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-        //Comprobar tirada.
-
+        }
+        catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ObjectOutputStream oos = null;
         try{
             oos = new ObjectOutputStream(os);
-            //oos.writeObject(Tablero);
+            oos.writeObject(tablero);
         } catch (IOException e) {
             e.printStackTrace();
         }
