@@ -11,6 +11,7 @@ class DatagramSocketClient {
     private int serverPort;
     private DatagramSocket socket;
     private Tablero tablero;
+    boolean checkWinner = false;
 
 
     void init(String host) throws SocketException,
@@ -22,9 +23,10 @@ class DatagramSocketClient {
 
     void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
-        //el servidor atén el port indefinidament
-        while(tablero.code == 1){
-            tablero.tirar();
+
+        while(tablero.code == 1 && !checkWinner){
+            checkWinner = Tablero.getGuanyador().isEmpty();
+            tablero.jugar();
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -69,7 +71,6 @@ class DatagramSocketClient {
 
     public static void main(String[] args) throws IOException {
         DatagramSocketClient socketClient = new DatagramSocketClient();
-
 
         String ipsrv;
         Scanner sc = new Scanner(System.in);
