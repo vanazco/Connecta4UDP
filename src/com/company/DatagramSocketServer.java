@@ -25,7 +25,8 @@ public class DatagramSocketServer {
         tablero = new Tablero();
 
         while(!checkWinner){
-            checkWinner = tablero.jugar();
+            checkWinner = Tablero.getGuanyador().isEmpty();
+
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
 
             socket.receive(packet);
@@ -53,12 +54,12 @@ public class DatagramSocketServer {
             System.out.println(tablero.isTurno());
             if(tablero.isTurno()){
                 tablero.code = 1;
-                tablero.pintarTablero();
+                tablero.jugar();
             }else{
                 tablero.code = -1;
-                tablero.pintarTablero();
-                tablero.getGuanyador();
+                tablero.jugar();
             }
+            tablero.getGuanyador();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,6 +77,13 @@ public class DatagramSocketServer {
         }
         byte[] respuesta = os.toByteArray();
         return respuesta;
+    }
+
+    public static void main(String[] args) throws IOException {
+        DatagramSocketServer server = new DatagramSocketServer();
+        server.init();
+        server.runServer();
+
     }
 
 }

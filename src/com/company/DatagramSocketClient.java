@@ -3,6 +3,7 @@ package com.company;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.Scanner;
 
 class DatagramSocketClient {
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -64,5 +65,19 @@ class DatagramSocketClient {
             e.printStackTrace();
         }
         return tablero.code;
+    }
+
+    public static void main(String[] args) throws IOException {
+        DatagramSocketClient socketClient = new DatagramSocketClient();
+
+
+        String ipsrv;
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Ip del servidor?");
+        ipsrv = sc.next();
+
+        socketClient.init(ipsrv);
+        socketClient.runClient();
     }
 }
