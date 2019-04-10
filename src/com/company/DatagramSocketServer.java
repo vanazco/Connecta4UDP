@@ -54,10 +54,8 @@ public class DatagramSocketServer {
             System.out.println(tablero.isTurno());
             if(tablero.isTurno()){
                 tablero.code = 1;
-                tablero.jugar();
             }else{
                 tablero.code = -1;
-                tablero.jugar();
             }
             tablero.getGuanyador();
         } catch (IOException e) {
