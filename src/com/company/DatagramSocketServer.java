@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.Scanner;
 
 public class DatagramSocketServer {
     private DatagramSocket socket;
@@ -50,9 +51,9 @@ public class DatagramSocketServer {
         try{
             ObjectInputStream ois = new ObjectInputStream(in);
              tablero = (Tablero) ois.readObject();
-            if(Tablero.isTurno()){
+            if(!Tablero.isTurno()){
                 tablero.code = 1;
-            } else {
+            } else{
                 tablero.code = -1;
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -74,6 +75,15 @@ public class DatagramSocketServer {
         DatagramSocketServer server = new DatagramSocketServer();
         server.init();
         server.runServer();
+
+        DatagramSocketClient socketClient = new DatagramSocketClient();
+
+        String ipsrv;
+
+        ipsrv = "192.168.22.114";
+
+        socketClient.init(ipsrv);
+        socketClient.runClient();
 
     }
 

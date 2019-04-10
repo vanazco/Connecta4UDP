@@ -11,24 +11,38 @@ class DatagramSocketClient {
     private DatagramSocket socket;
     private Tablero tablero;
     private boolean checkWinner = false;
+    private boolean torn = true;
 
-    private void init(String host) throws SocketException,
+    public void init(String host) throws SocketException,
             UnknownHostException {
         serverIP = InetAddress.getByName(host);
         serverPort = 42069;
         socket = new DatagramSocket();
     }
 
-    private void runClient() throws IOException {
+    public void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
 
         tablero = new Tablero();
-        tablero.code = -1;
+        tablero.code = 1;
 
         while(!checkWinner){
-            checkWinner = Tablero.getGuanyador().isEmpty();
-            if (tablero.code == -1) {
-                tablero.jugar();
+            checkWinner = !Tablero.getGuanyador().isEmpty();
+            if (tablero.code == 1) {
+                if(torn) {
+                    tablero.jugar();
+                    torn = false;
+                    tablero.setTurno(torn);
+                }else{
+                    torn = tablero.isTurno();
+                }
+            }else{
+                if(torn){
+                    tablero.jugar();
+                    torn = false;
+                }else{
+                    torn = tablero.isTurno();
+                }
             }
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -81,5 +95,6 @@ class DatagramSocketClient {
 
         socketClient.init(ipsrv);
         socketClient.runClient();
+
     }
 }
