@@ -2,7 +2,6 @@ package com.company;
 
 import java.io.*;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 class DatagramSocketClient {
@@ -11,22 +10,26 @@ class DatagramSocketClient {
     private int serverPort;
     private DatagramSocket socket;
     private Tablero tablero;
-    boolean checkWinner = false;
+    private boolean checkWinner = false;
 
-
-    void init(String host) throws SocketException,
+    private void init(String host) throws SocketException,
             UnknownHostException {
         serverIP = InetAddress.getByName(host);
         serverPort = 42069;
         socket = new DatagramSocket();
     }
 
-    void runClient() throws IOException {
+    private void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
 
-        while(tablero.code == 1 && !checkWinner){
+        tablero = new Tablero();
+        tablero.code = -1;
+
+        while(!checkWinner){
             checkWinner = Tablero.getGuanyador().isEmpty();
-            tablero.jugar();
+            if (tablero.code == -1) {
+                tablero.jugar();
+            }
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -42,7 +45,7 @@ class DatagramSocketClient {
 
             //creació del paquet per rebre les dades
             packet = new DatagramPacket(receivedData, 1024);
-            socket.setSoTimeout(5000);
+            //socket.setSoTimeout(5000);
             //espera de les dades
 
             try {
@@ -51,7 +54,7 @@ class DatagramSocketClient {
                 tablero.code = getDataToRequest(packet.getData(), packet.getLength());
             }catch(SocketTimeoutException e) {
                 System.out.println("El servidor no respòn: " + e.getMessage());
-                tablero.code=0;
+                tablero.code = 0;
             }
         }
     }
@@ -61,9 +64,7 @@ class DatagramSocketClient {
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
             tablero = (Tablero) ois.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return tablero.code;
@@ -75,7 +76,7 @@ class DatagramSocketClient {
         String ipsrv;
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Ip del servidor?");
+        System.out.print("Ip del servidor: ");
         ipsrv = sc.next();
 
         socketClient.init(ipsrv);

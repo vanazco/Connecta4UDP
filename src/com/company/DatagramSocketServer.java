@@ -8,16 +8,16 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 public class DatagramSocketServer {
-    DatagramSocket socket;
-    Tablero tablero;
-    boolean checkWinner = false;
+    private DatagramSocket socket;
+    private Tablero tablero;
+    private boolean checkWinner = false;
 
 
-    public void init() throws SocketException {
+    private void init() throws SocketException {
         socket = new DatagramSocket(42069);
     }
 
-    public void runServer() throws IOException {
+    private void runServer() throws IOException {
         byte [] receivingData = new byte[1024];
         byte [] sendingData;
         InetAddress clientIP;
@@ -25,6 +25,7 @@ public class DatagramSocketServer {
         tablero = new Tablero();
 
         while(!checkWinner){
+            System.out.println(checkWinner);
             checkWinner = Tablero.getGuanyador().isEmpty();
 
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
@@ -46,22 +47,17 @@ public class DatagramSocketServer {
 
     }
     private byte[] processData(byte[] data, int length) {
-        tablero = null;
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         try{
             ObjectInputStream ois = new ObjectInputStream(in);
              tablero = (Tablero) ois.readObject();
-            System.out.println(tablero.isTurno());
-            if(tablero.isTurno()){
+            System.out.println(Tablero.isTurno());
+            if(Tablero.isTurno()){
                 tablero.code = 1;
             }else{
                 tablero.code = -1;
             }
-            tablero.getGuanyador();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -73,8 +69,7 @@ public class DatagramSocketServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byte[] respuesta = os.toByteArray();
-        return respuesta;
+        return os.toByteArray();
     }
 
     public static void main(String[] args) throws IOException {
