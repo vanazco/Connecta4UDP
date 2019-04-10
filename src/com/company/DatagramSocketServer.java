@@ -26,13 +26,13 @@ public class DatagramSocketServer {
 
         while(!checkWinner){
             System.out.println(checkWinner);
-            checkWinner = Tablero.getGuanyador().isEmpty();
+            checkWinner = !Tablero.getGuanyador().isEmpty();
 
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
 
             socket.receive(packet);
 
-            sendingData = processData(packet.getData(), packet.getLength());
+            sendingData = processData(packet.getData());
 
             clientIP = packet.getAddress();
 
@@ -42,19 +42,17 @@ public class DatagramSocketServer {
                     clientIP, clientPort);
 
             socket.send(packet);
-
         }
 
     }
-    private byte[] processData(byte[] data, int length) {
+    private byte[] processData(byte[] data) {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         try{
             ObjectInputStream ois = new ObjectInputStream(in);
              tablero = (Tablero) ois.readObject();
-            System.out.println(Tablero.isTurno());
             if(Tablero.isTurno()){
                 tablero.code = 1;
-            }else{
+            } else {
                 tablero.code = -1;
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -62,7 +60,7 @@ public class DatagramSocketServer {
         }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ObjectOutputStream oos = null;
+        ObjectOutputStream oos;
         try{
             oos = new ObjectOutputStream(os);
             oos.writeObject(tablero);
