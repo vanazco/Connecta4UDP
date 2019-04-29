@@ -5,61 +5,48 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.util.Scanner;
+
 
 public class DatagramSocketServer {
     private DatagramSocket socket;
-    private Tablero tablero;
-    private boolean checkWinner = false;
+    Tablero tablero;
 
-
-    private void init() throws SocketException {
+    public void init() throws SocketException {
         socket = new DatagramSocket(42069);
+        tablero = new Tablero();
     }
 
-    private void runServer() throws IOException {
+    public void runServer() throws IOException {
         byte [] receivingData = new byte[1024];
         byte [] sendingData;
         InetAddress clientIP;
         int clientPort;
-        tablero = new Tablero();
 
-        while(!checkWinner){
-            System.out.println(checkWinner);
-            checkWinner = !Tablero.getGuanyador().isEmpty();
+        while(true){
 
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
 
             socket.receive(packet);
 
-            sendingData = processData(packet.getData());
+            sendingData = processData(packet.getData(),packet.getLength());
 
             clientIP = packet.getAddress();
-
             clientPort = packet.getPort();
-
-            packet = new DatagramPacket(sendingData, sendingData.length,
-                    clientIP, clientPort);
+            packet = new DatagramPacket(sendingData, sendingData.length, clientIP, clientPort);
 
             socket.send(packet);
         }
-
     }
-    private byte[] processData(byte[] data) {
+    public byte[] processData(byte[] data, int length) {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         try{
             ObjectInputStream ois = new ObjectInputStream(in);
-             tablero = (Tablero) ois.readObject();
-            if(!Tablero.isTurno()){
-                tablero.code = 1;
-            } else{
-                tablero.code = -1;
-            }
+            tablero = (Tablero) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
 
+        tablero.code = 1;
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ObjectOutputStream oos;
         try{
@@ -71,20 +58,13 @@ public class DatagramSocketServer {
         return os.toByteArray();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws SocketException {
         DatagramSocketServer server = new DatagramSocketServer();
         server.init();
-        server.runServer();
-
-        DatagramSocketClient socketClient = new DatagramSocketClient();
-
-        String ipsrv;
-
-        ipsrv = "192.168.22.114";
-
-        socketClient.init(ipsrv);
-        socketClient.runClient();
-
+        try {
+            server.runServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 }

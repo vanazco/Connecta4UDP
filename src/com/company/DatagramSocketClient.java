@@ -12,6 +12,7 @@ class DatagramSocketClient {
     private Tablero tablero;
     private boolean checkWinner = false;
     private boolean torn = true;
+    private String nom;
 
     public void init(String host) throws SocketException,
             UnknownHostException {
@@ -22,28 +23,6 @@ class DatagramSocketClient {
 
     public void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
-
-        tablero = new Tablero();
-        tablero.code = 1;
-
-        while(!checkWinner){
-            checkWinner = !Tablero.getGuanyador().isEmpty();
-            if (tablero.code == 1) {
-                if(torn) {
-                    tablero.jugar();
-                    torn = false;
-                    tablero.setTurno(torn);
-                }else{
-                    torn = tablero.isTurno();
-                }
-            }else{
-                if(torn){
-                    tablero.jugar();
-                    torn = false;
-                }else{
-                    torn = tablero.isTurno();
-                }
-            }
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -59,8 +38,6 @@ class DatagramSocketClient {
 
             //creació del paquet per rebre les dades
             packet = new DatagramPacket(receivedData, 1024);
-            //socket.setSoTimeout(5000);
-            //espera de les dades
 
             try {
                 socket.receive(packet);
@@ -70,10 +47,9 @@ class DatagramSocketClient {
                 System.out.println("El servidor no respòn: " + e.getMessage());
                 tablero.code = 0;
             }
-        }
     }
 
-    private int getDataToRequest(byte[] data, int length) {
+    public int getDataToRequest(byte[] data, int length) {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
@@ -84,17 +60,25 @@ class DatagramSocketClient {
         return tablero.code;
     }
 
+    public void setNom(String n){
+        nom = n;
+    }
+
     public static void main(String[] args) throws IOException {
         DatagramSocketClient socketClient = new DatagramSocketClient();
 
-        String ipsrv;
+        String ipsrv,jugador;
         Scanner sc = new Scanner(System.in);
 
         System.out.print("Ip del servidor: ");
         ipsrv = sc.next();
+        System.out.println("nom de jugador: ");
+        jugador = sc.next();
+
+        socketClient.setNom(jugador);
+
 
         socketClient.init(ipsrv);
         socketClient.runClient();
-
     }
 }
