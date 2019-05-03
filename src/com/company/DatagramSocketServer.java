@@ -22,6 +22,7 @@ public class DatagramSocketServer {
         InetAddress clientIP;
         int clientPort;
 
+
         while(true){
 
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
@@ -38,17 +39,9 @@ public class DatagramSocketServer {
         }
     }
     public byte[] processData(byte[] data, int length) {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        try{
-            ObjectInputStream ois = new ObjectInputStream(in);
-            tablero = (Tablero) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        tablero.code = 1;
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ObjectOutputStream oos;
+        ObjectOutputStream oos = null;
         try{
             oos = new ObjectOutputStream(os);
             oos.writeObject(tablero);

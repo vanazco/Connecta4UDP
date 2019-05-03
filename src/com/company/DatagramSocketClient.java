@@ -2,6 +2,7 @@ package com.company;
 
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 class DatagramSocketClient {
@@ -10,9 +11,7 @@ class DatagramSocketClient {
     private int serverPort;
     private DatagramSocket socket;
     private Tablero tablero;
-    private boolean checkWinner = false;
-    private boolean torn = true;
-    private String nom;
+    public int result;
 
     public void init(String host) throws SocketException,
             UnknownHostException {
@@ -24,6 +23,7 @@ class DatagramSocketClient {
     public void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
 
+        while(true){
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
             oos.writeObject(tablero);
@@ -39,17 +39,24 @@ class DatagramSocketClient {
             //creació del paquet per rebre les dades
             packet = new DatagramPacket(receivedData, 1024);
 
+            socket.setSoTimeout(5000);
+
             try {
                 socket.receive(packet);
+
                 //processament de les dades rebudes i obtenció de la resposta
-                tablero.code = getDataToRequest(packet.getData(), packet.getLength());
+                result = getDataToRequest(packet.getData(), packet.getLength());
+                tablero.jugar();
+
             }catch(SocketTimeoutException e) {
                 System.out.println("El servidor no respòn: " + e.getMessage());
-                tablero.code = 0;
+                result = -2;
             }
+        }
     }
 
     public int getDataToRequest(byte[] data, int length) {
+
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
@@ -60,23 +67,15 @@ class DatagramSocketClient {
         return tablero.code;
     }
 
-    public void setNom(String n){
-        nom = n;
-    }
 
     public static void main(String[] args) throws IOException {
         DatagramSocketClient socketClient = new DatagramSocketClient();
 
-        String ipsrv,jugador;
+        String ipsrv;
         Scanner sc = new Scanner(System.in);
 
         System.out.print("Ip del servidor: ");
         ipsrv = sc.next();
-        System.out.println("nom de jugador: ");
-        jugador = sc.next();
-
-        socketClient.setNom(jugador);
-
 
         socketClient.init(ipsrv);
         socketClient.runClient();

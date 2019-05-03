@@ -10,7 +10,7 @@ class Tablero implements Serializable {
 
     private static boolean turno = false;
     private static String guanyador;
-    public int code;
+    public int code = 1;
     public static boolean isTurno() {
         return turno;
     }
