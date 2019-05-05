@@ -1,28 +1,22 @@
 package com.company;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 
 class Tablero implements Serializable {
-    private static String[][] tablero = new String[7][7];
 
-    private static boolean turno = false;
-    private static String guanyador;
-    public int code = 1;
+    private static String[][] tablero = new String[7][7];
+    static boolean pintado = true;
+    static int i =0;
+    static int j =0;
+    public static boolean turno = false;
+    public static String guanyador = "";
+
+
     public static boolean isTurno() {
         return turno;
     }
     public static void setTurno(boolean turno) {
         Tablero.turno = turno;
-    }
-
-    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-    Tablero() {
-        rellenarTablero();
-        guanyador = "";
     }
 
     static String getGuanyador() {
@@ -33,17 +27,24 @@ class Tablero implements Serializable {
         Tablero.guanyador = guanyador;
     }
 
-    boolean jugar() throws IOException {
+
+    Tablero(){
+        if(pintado){
+            rellenarTablero();
+        }
+
+    }
+
+    boolean jugar() {
         pintarTurno();
         pintarTablero();
-        tirar();
         return !guanyador.isEmpty();
     }
 
-    private static void preguntarDeNuevo() throws IOException {
+    private static void preguntarDeNuevo(){
         pintarTurno();
         pintarTablero();
-        tirar();
+
     }
 
     private static void pintarTurno() {
@@ -56,16 +57,17 @@ class Tablero implements Serializable {
     }
 
     private static void rellenarTablero() {
-        for (int i = 0; i < tablero.length; i++) {
-            for (int j = 0; j < tablero.length; j++) {
+        for(i = 0; i < tablero.length; i++) {
+            for (j = 0; j < tablero.length; j++) {
                 tablero[i][j] = " - ";
             }
         }
+        pintado = false;
     }
 
-    static void pintarTablero() {
+     public static void pintarTablero() {
         for (String[] strings : tablero) {
-            for (int j = 0; j < tablero.length; j++) {
+            for (j = 0; j < tablero.length; j++) {
                 System.out.print(strings[j]);
                 if (j == (tablero.length - 1)) {
                     System.out.println(" ");
@@ -74,18 +76,15 @@ class Tablero implements Serializable {
         }
     }
 
-    public static void tirar() throws IOException {
-        System.out.println(" 1  2  3  4  5  6  7");
-        System.out.print("Escoge una columna: ");
-        String leer = br.readLine();
+    public void tirar(String columna){
 
-        if (leer.isEmpty()) {
+        if (columna.isEmpty()) {
             System.out.println("No se ha escrito nada.");
             preguntarDeNuevo();
             return;
         }
 
-        int posicion = Integer.parseInt(leer);
+        int posicion = Integer.parseInt(columna);
 
         if (posicion >= 8 || posicion < 1) {
             System.out.println("Input invalido.");
@@ -156,4 +155,7 @@ class Tablero implements Serializable {
         }
         return false;
     }
+}
+class Tirada implements Serializable{
+    String columna;
 }

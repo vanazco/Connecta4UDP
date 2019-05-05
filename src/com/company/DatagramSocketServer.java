@@ -13,7 +13,7 @@ public class DatagramSocketServer {
 
     public void init() throws SocketException {
         socket = new DatagramSocket(42069);
-        tablero = new Tablero();
+
     }
 
     public void runServer() throws IOException {
@@ -21,7 +21,7 @@ public class DatagramSocketServer {
         byte [] sendingData;
         InetAddress clientIP;
         int clientPort;
-
+        tablero = new Tablero();
 
         while(true){
 
@@ -29,25 +29,40 @@ public class DatagramSocketServer {
 
             socket.receive(packet);
 
-            sendingData = processData(packet.getData(),packet.getLength());
+            sendingData = processData(packet.getData());
+
 
             clientIP = packet.getAddress();
             clientPort = packet.getPort();
             packet = new DatagramPacket(sendingData, sendingData.length, clientIP, clientPort);
 
             socket.send(packet);
+
+            //Verificar si cal acabar
         }
     }
-    public byte[] processData(byte[] data, int length) {
+    public byte[] processData(byte[] data) {
+        Tirada tirada = null;
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        try {
+            ObjectInputStream ois = new ObjectInputStream(in);
+            tirada = (Tirada) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        tablero.tirar(tirada.columna);
+        tablero.pintarTablero();
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ObjectOutputStream oos = null;
         try{
-            oos = new ObjectOutputStream(os);
+            ObjectOutputStream oos = new ObjectOutputStream(os);
             oos.writeObject(tablero);
+            oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return os.toByteArray();
     }
 
