@@ -10,6 +10,7 @@ import java.net.SocketException;
 public class DatagramSocketServer {
     private DatagramSocket socket;
     Tablero tablero;
+    boolean terminar = false;
 
     public void init() throws SocketException {
         socket = new DatagramSocket(42069);
@@ -23,7 +24,7 @@ public class DatagramSocketServer {
         int clientPort;
         tablero = new Tablero();
 
-        while(true){
+        while(!terminar){
 
             DatagramPacket packet = new DatagramPacket(receivingData, receivingData.length);
 
@@ -39,6 +40,9 @@ public class DatagramSocketServer {
             socket.send(packet);
 
             //Verificar si cal acabar
+            if(tablero.getGuanyador() != ""){
+                terminar = true;
+            }
         }
     }
     public byte[] processData(byte[] data) {
@@ -52,7 +56,7 @@ public class DatagramSocketServer {
         }
 
         tablero.tirar(tirada.columna);
-        tablero.pintarTablero();
+        tablero.jugar();
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try{

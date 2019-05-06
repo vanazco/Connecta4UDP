@@ -11,6 +11,7 @@ class DatagramSocketClient {
     private DatagramSocket socket;
     public Tirada tirada;
     public Tablero tablero;
+    private boolean acabar;
 
     public void init(String host) throws SocketException,
             UnknownHostException {
@@ -18,12 +19,13 @@ class DatagramSocketClient {
         serverPort = 42069;
         socket = new DatagramSocket();
         tirada = new Tirada();
+        acabar = false;
     }
 
     public void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
 
-        while(true){
+        while(!acabar){
             Scanner sc = new Scanner(System.in);
             System.out.println(" 1  2  3  4  5  6  7");
             System.out.print("Escoge una columna: ");
@@ -51,6 +53,7 @@ class DatagramSocketClient {
 
             //processament de les dades rebudes i obtenció de la resposta
             getDataToRequest(packet.getData());
+
 
         }
     }
