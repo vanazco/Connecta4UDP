@@ -97,6 +97,7 @@ class DatagramSocketClient {
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
             tablero = (Tablero) ois.readObject();
+            tablero.jugar();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
