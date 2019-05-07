@@ -13,7 +13,6 @@ class DatagramSocketClient {
     public Tablero tablero;
     boolean terminar = false;
     int jugador;
-    private boolean primera_jugada = true;
 
 
     public void init(String host) throws SocketException,
@@ -34,18 +33,9 @@ class DatagramSocketClient {
         sc.nextLine();
 
         while(!terminar){
-            if(primera_jugada){
                 System.out.println(" 1  2  3  4  5  6  7");
                 System.out.print("Escoge una columna: ");
                 tirada.columna = sc.nextLine();
-                primera_jugada = false;
-            }else {
-                tablero.jugar();
-                System.out.println(" 1  2  3  4  5  6  7");
-                System.out.print("Escoge una columna: ");
-                tirada.columna = sc.nextLine();
-            }
-
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -71,17 +61,13 @@ class DatagramSocketClient {
             getDataToRequest(packet.getData());
 
             if(tablero.turnoV){
-                if(primera_jugada){
                     tablero.jugar();
-                }
                 if(!tablero.getGuanyador().equals("")){
                     terminar = true;
                     System.out.println("Ha ganado" +tablero.getGuanyador());
                 }
             }else{
-                if(primera_jugada){
-                    tablero.jugar();
-                }
+                tablero.jugar();
                 System.out.println("NO ES TU TURNO");
                 if(!tablero.getGuanyador().equals("")){
                     terminar = true;
@@ -97,7 +83,6 @@ class DatagramSocketClient {
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
             tablero = (Tablero) ois.readObject();
-            tablero.jugar();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
