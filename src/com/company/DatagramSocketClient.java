@@ -11,6 +11,10 @@ class DatagramSocketClient {
     private DatagramSocket socket;
     public Tirada tirada;
     public Tablero tablero;
+    boolean terminar = false;
+    int jugador;
+    private boolean primera_jugada = true;
+
 
     public void init(String host) throws SocketException,
             UnknownHostException {
@@ -22,12 +26,26 @@ class DatagramSocketClient {
 
     public void runClient() throws IOException {
         byte [] receivedData = new byte[1024];
+        Scanner sc = new Scanner(System.in);
 
-        while(true){
-            Scanner sc = new Scanner(System.in);
-            System.out.println(" 1  2  3  4  5  6  7");
-            System.out.print("Escoge una columna: ");
-            tirada.columna = sc.nextLine();
+        System.out.print("Jugador 1 o 2: ");
+        jugador = sc.nextInt();
+        tirada.setJugador(jugador);
+        sc.nextLine();
+
+        while(!terminar){
+            if(primera_jugada){
+                System.out.println(" 1  2  3  4  5  6  7");
+                System.out.print("Escoge una columna: ");
+                tirada.columna = sc.nextLine();
+                primera_jugada = false;
+            }else {
+                tablero.jugar();
+                System.out.println(" 1  2  3  4  5  6  7");
+                System.out.print("Escoge una columna: ");
+                tirada.columna = sc.nextLine();
+            }
+
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -52,6 +70,24 @@ class DatagramSocketClient {
             //processament de les dades rebudes i obtenció de la resposta
             getDataToRequest(packet.getData());
 
+            if(tablero.turnoV){
+                if(primera_jugada){
+                    tablero.jugar();
+                }
+                if(!tablero.getGuanyador().equals("")){
+                    terminar = true;
+                    System.out.println("Ha ganado" +tablero.getGuanyador());
+                }
+            }else{
+                if(primera_jugada){
+                    tablero.jugar();
+                }
+                System.out.println("NO ES TU TURNO");
+                if(!tablero.getGuanyador().equals("")){
+                    terminar = true;
+                    System.out.println("Ha ganado" +tablero.getGuanyador());
+                }
+            }
         }
     }
 
@@ -61,7 +97,6 @@ class DatagramSocketClient {
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
             tablero = (Tablero) ois.readObject();
-            tablero.jugar();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

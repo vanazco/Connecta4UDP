@@ -4,35 +4,24 @@ import java.io.Serializable;
 
 class Tablero implements Serializable {
 
-    private static String[][] tablero = new String[7][7];
-    static boolean pintado = true;
-    static int i =0;
-    static int j =0;
-    public static boolean turno = false;
-    public static String guanyador = "";
+    public String[][] tablero = new String[7][7];
+    public int turno = 1;
+    public String guanyador = "";
+    public boolean turnoV = true;
 
 
-    public static boolean isTurno() {
-        return turno;
-    }
-    public static void setTurno(boolean turno) {
-        Tablero.turno = turno;
-    }
 
-    static String getGuanyador() {
+    public String getGuanyador() {
         return guanyador;
     }
 
-    private static void setGuanyador(String guanyador) {
-        Tablero.guanyador = guanyador;
+    public  void setGuanyador(String guanyador) {
+        this.guanyador = guanyador;
     }
 
 
     Tablero(){
-        if(pintado){
             rellenarTablero();
-        }
-
     }
 
     boolean jugar() {
@@ -41,33 +30,32 @@ class Tablero implements Serializable {
         return !guanyador.isEmpty();
     }
 
-    private static void preguntarDeNuevo(){
+    private void preguntarDeNuevo(){
         pintarTurno();
         pintarTablero();
 
     }
 
-    private static void pintarTurno() {
+    private void pintarTurno() {
         System.out.print("Turno de -> ");
-        if (turno) {
+        if (turno == 1) {
             System.out.println("\033[31m X \033[0m");
         } else {
             System.out.println("\033[33m O \033[0m");
         }
     }
 
-    private static void rellenarTablero() {
-        for(i = 0; i < tablero.length; i++) {
-            for (j = 0; j < tablero.length; j++) {
+    private void rellenarTablero() {
+        for(int i = 0; i < tablero.length; i++) {
+            for (int j = 0; j < tablero.length; j++) {
                 tablero[i][j] = " - ";
             }
         }
-        pintado = false;
     }
 
-     public static void pintarTablero() {
+     public void pintarTablero() {
         for (String[] strings : tablero) {
-            for (j = 0; j < tablero.length; j++) {
+            for (int j = 0; j < tablero.length; j++) {
                 System.out.print(strings[j]);
                 if (j == (tablero.length - 1)) {
                     System.out.println(" ");
@@ -95,24 +83,22 @@ class Tablero implements Serializable {
         comprovarPosicion(posicion, tablero);
     }
 
-    private static void comprovarPosicion(int leerPosicion, String[][] tablero) {
+    private void comprovarPosicion(int leerPosicion, String[][] tablero) {
         leerPosicion -= 1;
 
         for (int i = 6; i >= 0; i--) {
             if (tablero[i][leerPosicion].matches(" - ")) {
-                if (turno) {
+                if (turno == 1) {
                     tablero[i][leerPosicion] = "\033[31m X \033[0m";
-                    turno = false;
                     break;
                 } else {
                     tablero[i][leerPosicion] = "\033[33m O \033[0m";
-                    turno = true;
                     break;
                 }
             }
         }
 
-        if (!turno) {
+        if (turno != 1) {
             if (areFourConnected("\033[31m X \033[0m", tablero))
                 setGuanyador("\033[31m X \033[0m");
         } else {
@@ -121,7 +107,7 @@ class Tablero implements Serializable {
         }
     }
 
-    private static boolean areFourConnected(String player, String[][] tablero){
+    private boolean areFourConnected(String player, String[][] tablero){
 
         // horizontalCheck
         for (int j = 0; j < tablero.length - 3 ; j++ ){
@@ -158,4 +144,10 @@ class Tablero implements Serializable {
 }
 class Tirada implements Serializable{
     String columna;
+    int jugador;
+
+    public void setJugador(int jugador) {
+        this.jugador = jugador;
+    }
+
 }
